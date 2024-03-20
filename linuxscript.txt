@@ -1,0 +1,12 @@
+#!/bin/bash
+ 
+path="$1" 
+destino="$2"
+ 
+if [ -d $destino ] 
+then 
+ cp $path/*.txt $destino 
+ echo "txt files were copied" 
+else 
+ echo "Error: Directory destino does not exists." 
+fi
