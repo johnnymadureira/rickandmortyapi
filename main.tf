@@ -12,8 +12,29 @@ provider "aws" {
   region = "us-east-1"
 }
 
+
+data "aws_ami" "latest" {
+  most_recent      = true
+  owners           = ["993580406930"]
+
+  filter {
+    name   = "name"
+    values = ["import-ami-035f09d886b05721e"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 resource "aws_autoscaling_group" "asgr" {
-  name       = "asgr"
+  name_prefix       = "asgr"
   min_size   = 1
   max_size   = 3
   desired_capacity = 1
@@ -44,9 +65,8 @@ resource "aws_autoscaling_policy" "policyscale"{
     }
 }
 resource "aws_launch_configuration" "lc" {
-  name = "configuracaoAutoEscalonamento2"
-
-  image_id = "ami-0080e4c5bc078760e"
+  name_prefix = "conf_lc"
+  image_id = data.aws_ami.latest.id
 
   instance_type = "t2.micro"
 
