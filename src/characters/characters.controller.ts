@@ -24,11 +24,11 @@ export class CharactersController {
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updateCharacterDto: UpdateCharacterDto) {
-    return this.charactersService.update(+id, updateCharacterDto);
+    this.charactersService.update(id, updateCharacterDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.charactersService.remove(+id);
+    return this.charactersService.remove(id);
   }
 }

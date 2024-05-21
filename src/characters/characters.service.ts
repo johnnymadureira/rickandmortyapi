@@ -1,54 +1,37 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCharacterDto } from './dto/create-character.dto';
 import { UpdateCharacterDto } from './dto/update-character.dto';
-import { Character } from './entities/character.entity';
-import { log } from 'console';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Character } from 'src/Database/Model/CharacterModel';
 
-global.characters = [];
 
 @Injectable()
 export class CharactersService {
-  create(createCharacterDto: CreateCharacterDto) {
-    const character = new Character();
-    character.id =  global.characters.length + 1;
-    character.name =  createCharacterDto.name;
-    character.species =  createCharacterDto.species;
-    character.status =  createCharacterDto.status;
-    character.gender =  createCharacterDto.gender;
+  constructor(
+    @InjectModel(Character.name)
+    private readonly charactersModel: Model<Character>
+  ) {}
 
-    global.characters.push(character);
-    return character;
+  public async create(createCharacterDto: CreateCharacterDto) : Promise<Character> {
+    const character = this.charactersModel.create(createCharacterDto);
+    return character;  
   }
 
-  findAll() {
-    return global.characters;
+  public async findAll(): Promise<Character[]> {
+    return await this.charactersModel.find({ });
   }
 
-  findOne(id: number) {
-    return global.characters.find((character) => character.id === id);
+  public async findOne(id: number): Promise<Character> {
+    return await this.charactersModel.findById(id, {});
   }
 
-  update(id: number, updateCharacterDto: UpdateCharacterDto) {
-    var index = global.characters.findIndex(character => character.id === id);
-    if(index === -1){
-      throw new NotFoundException('Character not found.');
-    }
-
-    global.characters[index].name = updateCharacterDto.name;
-    global.characters[index].status = updateCharacterDto.status;
-    global.characters[index].species = updateCharacterDto.species;
-    global.characters[index].type = updateCharacterDto.type;
-    global.characters[index].gender = updateCharacterDto.gender;
-
-    return global.characters.find(character => character.id === id);
+  public async update(id: string, updateCharacterDto: UpdateCharacterDto) : Promise<Character>{
+    return await this.charactersModel.findByIdAndUpdate(id, updateCharacterDto);
   }
 
-  remove(id: number) {
-    var index = global.characters.findIndex(character => character.id === id);
-    console.log(index);
-    if(index === -1){
-      throw new NotFoundException('Character not found.');
-    }
-    return global.characters.splice(index, 1);
+  public async remove(id: string) : Promise<Character>{
+    console.log(id);
+    return this.charactersModel.findByIdAndDelete({_id: id});
   }
 }
